@@ -1,0 +1,133 @@
+/* =========================
+   FONDO GENERAL
+========================= */
+body {
+    background: linear-gradient(135deg, #0f0c29, #1a1a40, #24243e);
+    color: #F5F5F5;
+}
+
+/* =========================
+   HEADER
+========================= */
+.header {
+    text-align: center;
+    padding: 25px;
+}
+
+.header h1 {
+    font-size: 42px;
+    background: linear-gradient(90deg, #ff4ecd, #4cc9f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header p {
+    font-size: 16px;
+    color: #cfcfcf;
+}
+
+/* =========================
+   KPI CARDS (NEON STYLE)
+========================= */
+div[data-testid="stMetric"] {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 78, 205, 0.3);
+    box-shadow: 0 0 15px rgba(255, 78, 205, 0.2);
+    transition: 0.3s;
+}
+
+/* Hover efecto neon */
+div[data-testid="stMetric"]:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 25px rgba(76, 201, 240, 0.6);
+}
+
+/* Valor KPI */
+div[data-testid="stMetricValue"] {
+    font-size: 30px;
+    color: #ffffff;
+}
+
+/* Label KPI */
+div[data-testid="stMetricLabel"] {
+    color: #bbbbbb;
+    font-size: 14px;
+}
+
+/* =========================
+   TITULOS
+========================= */
+h2, h3 {
+    color: #4cc9f0;
+}
+
+/* =========================
+   SUBTITULOS INTERNOS
+========================= */
+h4 {
+    color: #ff4ecd;
+}
+
+/* =========================
+   SEPARADORES
+========================= */
+hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #ff4ecd, #4cc9f0, transparent);
+}
+
+/* =========================
+   TEXTO SECUNDARIO
+========================= */
+.stCaption {
+    color: #bbbbbb;
+}
+
+/* =========================
+   SCROLLBAR (detalle pro)
+========================= */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(#ff4ecd, #4cc9f0);
+    border-radius: 10px;
+}
+
+/* =========================
+   INSIGHT CARDS (VICE CITY)
+========================= */
+.insight-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(76, 201, 240, 0.3);
+    box-shadow: 0 0 15px rgba(76, 201, 240, 0.2);
+    transition: 0.3s;
+    margin-bottom: 15px;
+}
+
+.insight-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 25px rgba(255, 78, 205, 0.6);
+}
+
+.insight-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff4ecd;
+    margin-bottom: 10px;
+}
+
+.insight-text {
+    font-size: 14px;
+    color: #dddddd;
+    line-height: 1.6;
+}
