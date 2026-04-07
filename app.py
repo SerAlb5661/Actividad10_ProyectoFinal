@@ -4,8 +4,10 @@ import pyodbc
 import plotly.graph_objects as go
 
 # ==============================
-# FUNCIONES AUXILIARES
+# 🧠 FUNCIONES AUXILIARES (SOPORTE VISUAL - NO CAPA)
 # ==============================
+# Estas funciones apoyan la visualización (frontend), no pertenecen a una capa de datos
+
 def formatear_texto(texto):
     lineas = texto.split("\n")
     lineas_limpias = [line.strip() for line in lineas if line.strip() != ""]
@@ -23,8 +25,9 @@ def estilo_plotly(fig):
     return fig
 
 # ==============================
-# CONFIGURACIÓN GENERAL
+# ⚙ CONFIGURACIÓN GENERAL (PRESENTACIÓN - NO CAPA)
 # ==============================
+
 st.set_page_config(
     page_title="BI Educación Bolivia",
     layout="wide",
@@ -32,8 +35,9 @@ st.set_page_config(
 )
 
 # ==============================
-# CSS
+# 🎨 CSS (CAPA DE PRESENTACIÓN)
 # ==============================
+
 def load_css():
     with open("estilo.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -41,8 +45,11 @@ def load_css():
 load_css()
 
 # ==============================
-# CONEXIÓN
+# 🥉 CAPA BRONZE (INGESTA DE DATOS)
 # ==============================
+# Aquí se conecta a la fuente de datos (SQL Server)
+# Representa datos crudos provenientes del sistema transaccional
+
 server = r'localhost\SQLEXPRESS'
 database = 'BI_Educacion'
 driver = 'ODBC Driver 17 for SQL Server'
@@ -55,8 +62,11 @@ conn = pyodbc.connect(
 )
 
 # ==============================
-# QUERY
+# 🥇 CAPA GOLD (MODELO ANALÍTICO)
 # ==============================
+# Consulta optimizada sobre modelo estrella
+# Aquí ya trabajamos con datos estructurados para análisis (HECHOS + DIMENSIONES)
+
 query = """
 SELECT 
     t.anio,
@@ -75,8 +85,10 @@ ORDER BY t.anio
 df = pd.read_sql(query, conn)
 
 # ==============================
-# FILTRO DINÁMICO
+# 🥈 CAPA SILVER (TRANSFORMACIÓN / FILTRO)
 # ==============================
+# Aquí se aplican filtros dinámicos y preparación de datos para análisis
+
 st.sidebar.header("🎛 Filtros")
 
 anio_min, anio_max = int(df["anio"].min()), int(df["anio"].max())
@@ -88,11 +100,14 @@ rango = st.sidebar.slider(
     (anio_min, anio_max)
 )
 
+# Dataset limpio y preparado para visualización
 df_filtrado = df[(df["anio"] >= rango[0]) & (df["anio"] <= rango[1])]
 
 # ==============================
-# HEADER
+# 🖥 CAPA DE PRESENTACIÓN (DASHBOARD)
 # ==============================
+
+# HEADER
 st.markdown("""
 <div class="header">
     <h1>📊 Educación y Brecha Digital Laboral</h1>
@@ -103,15 +118,16 @@ st.markdown("""
 st.markdown("---")
 
 # ==============================
-# ARQUITECTURA MEDALLÓN
+# 🧠 VISUALIZACIÓN DE ARQUITECTURA (EXPLICACIÓN)
 # ==============================
+
 st.subheader("🏗️ Arquitectura de Datos (Medallion)")
 
 st.markdown("""
 <div class="insight-card">
     <div class="insight-title">🔹 Capa Bronze (Ingesta)</div>
     <div class="insight-text">
-    Integración de datos desde SQL Server y datos de CEPALSTAT, consolidando fuentes para análisis.
+    Extracción de datos desde SQL Server y fuentes externas (CEPALSTAT).
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -120,7 +136,7 @@ st.markdown("""
 <div class="insight-card">
     <div class="insight-title">🔹 Capa Silver (Transformación)</div>
     <div class="insight-text">
-    Limpieza, normalización y validación de datos, asegurando consistencia y calidad para análisis.
+    Limpieza, filtrado dinámico y preparación de datos para análisis.
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -129,7 +145,7 @@ st.markdown("""
 <div class="insight-card">
     <div class="insight-title">🔹 Capa Gold (Modelo Analítico)</div>
     <div class="insight-text">
-    Modelo estrella en SQL Server optimizado para análisis de empleabilidad y generación de KPIs.
+    Modelo estrella optimizado para generación de KPIs y análisis estratégico.
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -137,8 +153,9 @@ st.markdown("""
 st.markdown("---")
 
 # ==============================
-# KPIs
+# 📊 KPIs (CAPA GOLD - CONSUMO DE NEGOCIO)
 # ==============================
+
 st.subheader("📌 Indicadores Clave")
 
 col1, col2, col3 = st.columns(3)
@@ -152,15 +169,16 @@ with col2:
 with col3:
     st.metric("Nivel TIC Promedio", f"{df_filtrado['tic'].mean():.2f}%")
 
-# KPI estratégico
+# KPI estratégico derivado (análisis avanzado)
 brecha = df_filtrado["tic"] - df_filtrado["tasa_empleabilidad"]
 st.metric("📉 Brecha Digital Laboral", f"{brecha.mean():.2f}")
 
 st.markdown("---")
 
 # ==============================
-# GRÁFICOS
+# 📈 VISUALIZACIONES (CAPA GOLD → PRESENTACIÓN)
 # ==============================
+
 st.subheader("📈 Evolución de la Empleabilidad")
 
 fig1 = go.Figure()
@@ -170,9 +188,14 @@ fig1.add_trace(go.Scatter(
     mode="lines+markers",
     line=dict(color="#4cc9f0", width=3, shape="spline")
 ))
+
 st.plotly_chart(estilo_plotly(fig1), use_container_width=True)
 
 st.markdown("---")
+
+# ==============================
+# 📊 COMPARACIONES ESTRATÉGICAS
+# ==============================
 
 st.subheader("📊 Brecha Digital vs Mercado Laboral")
 
@@ -195,10 +218,7 @@ with col1:
         line=dict(color="#4cc9f0", width=3, shape="spline")
     ))
 
-    fig2.update_layout(title="TIC vs Empleabilidad")
-
     st.plotly_chart(estilo_plotly(fig2), use_container_width=True)
-
 
 with col2:
     fig3 = go.Figure()
@@ -217,15 +237,14 @@ with col2:
         line=dict(color="#4cc9f0", width=3, shape="spline")
     ))
 
-    fig3.update_layout(title="Desempleo vs Empleabilidad")
-
     st.plotly_chart(estilo_plotly(fig3), use_container_width=True)
 
 st.markdown("---")
 
 # ==============================
-# SCATTER
+# 🎯 ANÁLISIS DE RELACIÓN (INSIGHT DATA)
 # ==============================
+
 st.subheader("🎯 Relación entre TIC y Empleabilidad")
 
 fig4 = go.Figure()
@@ -242,8 +261,9 @@ st.plotly_chart(estilo_plotly(fig4), use_container_width=True)
 st.markdown("---")
 
 # ==============================
-# INSIGHTS
+# 🧠 INSIGHTS (CAPA DE VALOR DE NEGOCIO)
 # ==============================
+
 st.subheader("🧠 Insights Estratégicos")
 
 corr_tic = df_filtrado["tic"].corr(df_filtrado["tasa_empleabilidad"])
@@ -252,81 +272,38 @@ corr_des = df_filtrado["desempleo"].corr(df_filtrado["tasa_empleabilidad"])
 anio_inicio = int(df_filtrado["anio"].min())
 anio_fin = int(df_filtrado["anio"].max())
 
-# ==========================
-# INSIGHT 1: TIC vs EMPLEABILIDAD (DINÁMICO)
-# ==========================
-
-if corr_tic < 0:
-    insight_tic = f"""
-    Durante el periodo {anio_inicio}-{anio_fin}, la relación negativa entre habilidades TIC y empleabilidad (corr: {corr_tic:.2f}) sugiere que el crecimiento en acceso o formación digital no se ha traducido directamente en mejores oportunidades laborales.
-
-    Esto evidencia una posible desconexión entre la formación tecnológica y las necesidades reales del mercado, donde las habilidades adquiridas no están alineadas con los perfiles demandados.
-
-    Desde una perspectiva estratégica, este resultado indica la necesidad de orientar la educación digital hacia competencias aplicadas, vinculadas a sectores productivos específicos, para lograr un impacto real en la empleabilidad.
-    """
-else:
-    insight_tic = f"""
-    Durante el periodo {anio_inicio}-{anio_fin}, la relación positiva entre habilidades TIC y empleabilidad (corr: {corr_tic:.2f}) indica que el desarrollo de competencias digitales está contribuyendo a mejorar la inserción laboral.
-
-    Esto sugiere una transición hacia un mercado laboral más digitalizado, donde las habilidades tecnológicas comienzan a tener un impacto tangible.
-
-    Estratégicamente, esto refuerza la importancia de seguir fortaleciendo la educación en TIC como un motor clave para el crecimiento económico y la empleabilidad sostenible.
-    """
-
-# ==========================
-# INSIGHT 2: DESEMPLEO vs EMPLEABILIDAD (DINÁMICO)
-# ==========================
-
-if corr_des > 0:
-    insight_des = f"""
-    En el periodo {anio_inicio}-{anio_fin}, la relación positiva entre desempleo y empleabilidad (corr: {corr_des:.2f}) refleja un comportamiento atípico frente a lo esperado en modelos económicos tradicionales.
-
-    Este fenómeno puede estar influenciado por factores estructurales como la informalidad o el subempleo, donde las estadísticas de empleo no capturan completamente la calidad del trabajo.
-
-    A nivel estratégico, esto sugiere que no basta con medir la cantidad de empleo, sino que es fundamental incorporar indicadores de calidad laboral para entender el verdadero estado del mercado.
-    """
-else:
-    insight_des = f"""
-    En el periodo {anio_inicio}-{anio_fin}, la relación negativa entre desempleo y empleabilidad (corr: {corr_des:.2f}) confirma la dinámica esperada del mercado laboral.
-
-    Esto indica que las condiciones macroeconómicas están influyendo directamente en la capacidad de inserción laboral.
-
-    Desde una perspectiva estratégica, la reducción del desempleo sigue siendo un factor clave, pero debe ir acompañada de políticas que fortalezcan la calidad y sostenibilidad del empleo generado.
-    """
-
-# ==========================
-# INSIGHT 3: VISIÓN GLOBAL
-# ==========================
-
-insight_general = f"""
-El análisis del periodo {anio_inicio}-{anio_fin} muestra que la empleabilidad en Bolivia no depende de un único factor, sino de la interacción entre educación, acceso a tecnología y condiciones del mercado laboral.
-
-Aunque el acceso a TIC ha crecido, su impacto no es automático, lo que evidencia una brecha más profunda relacionada con la alineación entre formación y demanda laboral.
-
-Esto sugiere que el verdadero desafío no es solo reducir la brecha digital, sino construir un ecosistema donde educación, innovación y mercado trabajen de forma coordinada para generar oportunidades reales.
+# INSIGHT 1
+insight_tic = f"""
+Durante el periodo {anio_inicio}-{anio_fin}, la relación entre TIC y empleabilidad (corr: {corr_tic:.2f}) permite identificar el nivel de alineación entre habilidades digitales y mercado laboral.
 """
 
-# ==========================
-# RENDER INSIGHTS
-# ==========================
+# INSIGHT 2
+insight_des = f"""
+Durante el mismo periodo, la relación entre desempleo y empleabilidad (corr: {corr_des:.2f}) refleja las condiciones estructurales del mercado laboral.
+"""
+
+# INSIGHT 3
+insight_general = f"""
+El análisis evidencia que la empleabilidad depende de múltiples factores y no únicamente del acceso a tecnología.
+"""
 
 st.markdown(f"""
 <div class="insight-card">
-<div class="insight-title">💻 Brecha Digital y Empleo</div>
+<div class="insight-title">💻 Brecha Digital</div>
 <div class="insight-text">{formatear_texto(insight_tic)}</div>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="insight-card">
-<div class="insight-title">📉 Dinámica del Mercado Laboral</div>
+<div class="insight-title">📉 Mercado Laboral</div>
 <div class="insight-text">{formatear_texto(insight_des)}</div>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="insight-card">
-<div class="insight-title">🧠 Lectura Estratégica Global</div>
+<div class="insight-title">🧠 Lectura Global</div>
 <div class="insight-text">{formatear_texto(insight_general)}</div>
 </div>
 """, unsafe_allow_html=True)
@@ -334,19 +311,11 @@ st.markdown(f"""
 st.markdown("---")
 
 # ==============================
-# REFLEXIÓN FINAL
+# 🌆 REFLEXIÓN FINAL (DECISIÓN)
 # ==============================
 
-mensaje_final = f"""
-Durante el periodo analizado ({anio_inicio}-{anio_fin}), los datos muestran que el desafío no es únicamente mejorar indicadores, sino transformar realidades.
-
-Detrás de cada porcentaje hay personas enfrentando barreras para acceder a oportunidades laborales dignas, en un contexto donde la tecnología avanza más rápido que la capacidad de adaptación del sistema educativo.
-
-La brecha digital no es solo una cuestión de acceso, sino de oportunidades reales. Y cerrarla implica tomar decisiones estratégicas que conecten educación, innovación y desarrollo económico.
-
-El valor de este análisis no está únicamente en entender qué ocurre, sino en impulsar acciones que permitan que el crecimiento tecnológico se traduzca en bienestar tangible.
-
-Porque al final, los datos no cambian el mundo… pero las decisiones basadas en ellos sí.
+mensaje_final = """
+El valor del BI no está en los datos, sino en las decisiones que permite tomar.
 """
 
 st.markdown(f"""
